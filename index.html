@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rope3D</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <style>
+        .noscroll {
+            position: fixed;
+            overflow: hidden;
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: #ffffff;
+        }
+        #spinner {
+            display: none;
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            top: 50%;
+            left: 50%;
+            margin-top: -20px;
+            margin-left: -20px;
+            z-index: 101;
+            background-color: #3498db;
+            -webkit-animation: sk-rotateplane 1.2s infinite ease-in-out;
+            animation: sk-rotateplane 1.2s infinite ease-in-out;
+        }
+        @-webkit-keyframes sk-rotateplane {
+            0% { -webkit-transform: perspective(120px) }
+            50% { -webkit-transform: perspective(120px) rotateY(180deg) }
+            100% { -webkit-transform: perspective(120px) rotateY(180deg)  rotateX(180deg) }
+        }
+        @keyframes sk-rotateplane {
+            0% {
+                transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+                -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg)
+            } 50% {
+                  transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+                  -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg)
+              } 100% {
+                    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+                    -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+                }
+        }
+    </style>
+</head>
+
+<body style="margin: 0; padding: 0; overflow: hidden; position: fixed; width: 100%; height: 100%" class="noscroll">
+<div id="overlay" style="display: block"></div>
+<div id="spinner" style="display: block"></div>
+<script>
+    const overlay = document.getElementById("overlay")
+    const spinner = document.getElementById("spinner")
+    const head = document.getElementsByTagName('head')[0]
+    const scripts = ['bundle.js']
+    let loadedScripts = 0
+    let totalScripts = scripts.length
+    const loadSingleScript = function(atPath) {
+        const scriptDOM = document.createElement('script')
+        scriptDOM.type = 'text/javascript'
+        scriptDOM.onload = function() {
+            loadedScripts += 1
+            console.log(`%cBundle loading: bundle ${loadedScripts}/${totalScripts} : ${atPath}`, 'color: #2222CC')
+            if (scripts.length > 0) {
+                loadSingleScript(scripts.shift())
+            } else {
+                document.body.removeChild(overlay)
+                document.body.removeChild(spinner)
+                document.body.className = document.body.className.replace(/\bnoscroll\b/,'');
+            }
+        }
+        scriptDOM.src = atPath
+        head.appendChild(scriptDOM)
+    }
+    loadSingleScript(scripts.shift())
+</script>
+</body>
+</html>
