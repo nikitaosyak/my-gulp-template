@@ -1,29 +1,10 @@
-let ENV = null
-const envResult = require('dotenv').config()
-if (envResult.error) {
-    console.log('tryParseEnv: .env not found, generating default')
-
-    ENV = {
-        MODE : 'development',
-        HOST : '0.0.0.0',
-        PORT : 8000
-    }
-
-    require('fs').writeFileSync('./.env', 'MODE=development\n' +
-        'HOST=0.0.0.0\n' +
-        'PORT=8000')
-    console.log('tryParseEnv: .env successfully created')
-} else {
-
-    console.log('tryParseEnv: .env found')
-    console.log(envResult.parsed)
-    ENV = envResult.parsed
-}
+const fs = require('fs')
+const config = JSON.parse(fs.readFileSync("./config.json", {encoding:'utf-8'}))
 
 const {src, watch, dest, series, parallel, task} = require('gulp')
 
 const clean = cb=>require('rimraf')('build/', cb)
-const create_build_dir = cb => require('fs').mkdir('build', cb)
+const create_build_dir = cb => fs.mkdir('build', cb)
 
 const rollup = () => {
     const sourcemaps = require('gulp-sourcemaps')
@@ -63,8 +44,8 @@ const connect = require('gulp-connect')
 const dev_server = cb => {
     connect.server({
         root : 'build',
-        host : ENV.HOST,
-        port : ENV.PORT,
+        host : config[config.MODE].HOST,
+        port : config[config.MODE].PORT,
         livereload : true,
         debug : true
     })
